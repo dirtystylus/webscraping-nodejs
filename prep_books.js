@@ -1,15 +1,23 @@
 const fs = require("fs");
 
-fs.readFile("./books.json", "utf8", (err, jsonString) => {
+function jsonReader(filePath, cb) {
+  fs.readFile(filePath, (err, fileData) => {
+    if (err) {
+      return cb && cb(err);
+    }
+    try {
+      const object = JSON.parse(fileData);
+      return cb && cb(null, object);
+    } catch (err) {
+      return cb && cb(err);
+    }
+  });
+}
+
+jsonReader("./books.json", (err, bookData) => {
   if (err) {
-    console.log("File read failed", err);
+    console.log(err);
     return;
   }
-  try {
-    const bookData = JSON.parse(jsonString);
-    console.log("books: ", bookData.books[0].title);
-  } catch (error) {
-    console.log("Error parsing JSON string", err);
-  }
-  console.log("File data:", jsonString);
+  console.log(bookData.books[0].title);
 });
