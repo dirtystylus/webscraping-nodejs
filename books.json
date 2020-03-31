@@ -1,0 +1,16 @@
+{
+  "books": [
+    {
+      "title": "China Rich Girlfriend",
+      "author": "Kevin Kwan",
+      "cover_image": "book-nk-jemisin-black-future-month.jpg",
+      "genre": "Fiction"
+    },
+    {
+      "title": "Good and Mad",
+      "author": "Rebecca Traister",
+      "cover_image": "book-nk-jemisin-black-future-month.jpg",
+      "genre": "Nonfiction"
+    }
+  ]
+}
