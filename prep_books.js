@@ -19,5 +19,23 @@ jsonReader("./books.json", (err, bookData) => {
     console.log(err);
     return;
   }
-  console.log(bookData.books[0].title);
+  // const books = bookData.books;
+  const queryBaseUrl = "https://bookshop.org/books?keywords=";
+  const queryBooks = [];
+  bookData.forEach(book => {
+    const queryTitle = book.title.split(" ").join("+");
+    const bookQuery = {
+      queryURL: queryBaseUrl + queryTitle
+    };
+    queryBooks.push(bookQuery);
+  });
+  console.log("queryBooks: ", queryBooks);
+  const jsonString = JSON.stringify(queryBooks);
+  fs.writeFile("./book_queries.json", jsonString, err => {
+    if (err) {
+      console.log("Error writing file", err);
+    } else {
+      console.log("Successfully wrote file");
+    }
+  });
 });
