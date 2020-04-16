@@ -27,11 +27,7 @@ function getData(html) {
     ".booklist .booklist-book:first-child .product-image > img"
   ).attr("data-src");
   const title = $(".booklist .booklist-book:first-child h2 > a").text();
-  const imgName =
-    title
-      .toLowerCase()
-      .split(" ")
-      .join("-") + ".jpg";
+  const imgName = title.toLowerCase().split(" ").join("-") + ".jpg";
   request(imgUrl).pipe(fs.createWriteStream(imgName));
   // console.log("data: ", data);
 }
@@ -51,11 +47,11 @@ function getData(html) {
 function getImage(url) {
   axios
     .get(url)
-    .then(response => {
+    .then((response) => {
       getData(response.data);
       // console.log(response.data);
     })
-    .catch(error => {
+    .catch((error) => {
       console.log("error: ", error);
     });
 }
@@ -69,19 +65,9 @@ jsonReader("./book_queries.json", (err, bookData) => {
   // try this with Bluebird
 
   const urls = [];
-  bookData.forEach(book => {
+  bookData.forEach((book) => {
     // console.log(book.queryURL);
     urls.push(book.queryURL);
-    // axios
-    //   .get(book.queryURL)
-    //   .then(response => {
-    //     getData(response.data);
-    //     // console.log(response.data);
-    //   })
-    //   .catch(error => {
-    //     console.log("error: ", error);
-    //   });
   });
-  // console.log("urls:", urls);
   Promise.map(urls, getImage, { concurrency: 1 });
 });
