@@ -25,7 +25,7 @@ jsonReader("./books.json", (err, bookData) => {
   bookData.forEach(book => {
     const queryTitle = book.title.split(" ").join("+");
     const bookQuery = {
-      queryURL: queryBaseUrl + queryTitle
+      queryURL: queryBaseUrl + encodeURIComponent(queryTitle)
     };
     queryBooks.push(bookQuery);
   });
