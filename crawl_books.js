@@ -1,8 +1,9 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const fs = require("fs");
-
-const url = "http://books.toscrape.com/";
+var Promise = require("bluebird");
+const request = require("request");
+const path = require("path");
 
 function jsonReader(filePath, cb) {
   fs.readFile(filePath, (err, fileData) => {
@@ -21,42 +22,66 @@ function jsonReader(filePath, cb) {
 function getData(html) {
   data = [];
   const $ = cheerio.load(html);
-  data.push({
-    img: $(".booklist .booklist-book:first-child .product-image > img").attr(
-      "data-src"
-    )
-  });
-  console.log("data: ", data);
+
+  const imgUrl = $(
+    ".booklist .booklist-book:first-child .product-image > img"
+  ).attr("data-src");
+  const title = $(".booklist .booklist-book:first-child h2 > a").text();
+  const imgName =
+    title
+      .toLowerCase()
+      .split(" ")
+      .join("-") + ".jpg";
+  request(imgUrl).pipe(fs.createWriteStream(imgName));
+  // console.log("data: ", data);
 }
 
-axios
-  .get(url)
-  .then(response => {
-    getData(response.data);
-    // console.log(response.data);
-  })
-  .catch(error => {
-    console.log("error:", error);
-  });
+// axios
+//   .get(url)
+//   .then(response => {
+//     getData(response.data);
+//     // console.log(response.data);
+//   })
+//   .catch(error => {
+//     console.log("error:", error);
+//   });
 
 //getData(response.data);
+
+function getImage(url) {
+  axios
+    .get(url)
+    .then(response => {
+      getData(response.data);
+      // console.log(response.data);
+    })
+    .catch(error => {
+      console.log("error: ", error);
+    });
+}
 
 jsonReader("./book_queries.json", (err, bookData) => {
   if (err) {
     console.log("error: ", err);
     return;
   }
-  // const books = bookData.books;
+
+  // try this with Bluebird
+
+  const urls = [];
   bookData.forEach(book => {
     // console.log(book.queryURL);
-    axios
-      .get(book.queryURL)
-      .then(response => {
-        getData(response.data);
-        // console.log(response.data);
-      })
-      .catch(error => {
-        console.log("error: ", error);
-      });
+    urls.push(book.queryURL);
+    // axios
+    //   .get(book.queryURL)
+    //   .then(response => {
+    //     getData(response.data);
+    //     // console.log(response.data);
+    //   })
+    //   .catch(error => {
+    //     console.log("error: ", error);
+    //   });
   });
+  // console.log("urls:", urls);
+  Promise.map(urls, getImage, { concurrency: 1 });
 });
